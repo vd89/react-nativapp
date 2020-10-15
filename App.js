@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Button, FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
+import GoalInput from './components/GoalInput';
+import { GoalItem } from './components/GoalItem';
 
 export default function App() {
-  const [enteredGoal, setEnteredGoal] = useState('');
   const [courseGoals, setCourseGoals] = useState([]);
 
   useEffect(() => {
@@ -11,36 +12,19 @@ export default function App() {
       console.log('lug:', position.coords.longitude);
     });
   }, []);
-  const onchangeHandler = async (enteredText) => {
-    await setEnteredGoal(enteredText);
-  };
 
-  const addGoalHandler = () => {
-    setCourseGoals((courseGoals) => [...courseGoals, { id: Math.random.toString(), value: enteredGoal }]);
+  const addGoalHandler = (goalTitle) => {
+    setCourseGoals((courseGoals) => [...courseGoals, { id: Math.random.toString(), value: goalTitle }]);
   };
-  const { root, input, inputContainer, listItem } = styles;
+  const { root } = styles;
   return (
     <View style={root}>
-      <View style={inputContainer}>
-        <TextInput
-          placeholder='Enter Course Goal'
-          style={input}
-          onChangeText={(text) => onchangeHandler(text)}
-          value={enteredGoal}
-        />
-        <Button title='Add' onPress={addGoalHandler} />
-      </View>
-      <View>
-        <FlatList
-          data={courseGoals}
-          keyExtractor={(itemData) => itemData.id}
-          renderItem={(itemData) => (
-            <View style={listItem}>
-              <Text> ❤️ {itemData.item.value} </Text>
-            </View>
-          )}
-        />
-      </View>
+      <GoalInput onAddGoal={addGoalHandler} />
+      <FlatList
+        data={courseGoals}
+        keyExtractor={(itemData) => itemData.id}
+        renderItem={(itemData) => <GoalItem title={itemData.item.value} />}
+      />
     </View>
   );
 }
@@ -48,24 +32,5 @@ export default function App() {
 const styles = StyleSheet.create({
   root: {
     padding: 35,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  input: {
-    borderBottomColor: 'black',
-    width: '80%',
-    borderBottomWidth: 1,
-    margin: 2,
-    padding: 10,
-  },
-  listItem: {
-    padding: 10,
-    marginVertical: 15,
-    backgroundColor: '#ccc',
-    borderColor: 'black',
-    borderWidth: 1,
   },
 });
