@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { Button, FlatList, StyleSheet, View } from 'react-native';
 import GoalInput from './components/GoalInput';
 import { GoalItem } from './components/GoalItem';
 
 export default function App() {
   const [courseGoals, setCourseGoals] = useState([]);
+  const [isAddMode, setIsAddMode] = useState(false);
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition((position) => {
@@ -15,16 +16,23 @@ export default function App() {
 
   const addGoalHandler = (goalTitle) => {
     setCourseGoals((courseGoals) => [...courseGoals, { id: Math.random().toString(), value: goalTitle }]);
+    setIsAddMode(false);
   };
   const removeGoalHandler = (goalId) => {
     setCourseGoals((courseGoals) => {
       return courseGoals.filter((goal) => goal.id !== goalId);
     });
   };
+
+  const cancelGoalAdditionHandler = () => {
+    setIsAddMode(false);
+  };
   const { root } = styles;
   return (
     <View style={root}>
-      <GoalInput onAddGoal={addGoalHandler} />
+      <Button title='Add new Goal' onPress={() => setIsAddMode(true)} />
+
+      <GoalInput visible={isAddMode} onAddGoal={addGoalHandler} onCancel={cancelGoalAdditionHandler} />
       <FlatList
         data={courseGoals}
         keyExtractor={(itemData) => itemData.id}
