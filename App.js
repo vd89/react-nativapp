@@ -1,16 +1,22 @@
-import React, { useState } from 'react';
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Button, FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
 
 export default function App() {
   const [enteredGoal, setEnteredGoal] = useState('');
   const [courseGoals, setCourseGoals] = useState([]);
 
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition((position) => {
+      console.log('lat:', position.coords.latitude);
+      console.log('lug:', position.coords.longitude);
+    });
+  }, []);
   const onchangeHandler = async (enteredText) => {
     await setEnteredGoal(enteredText);
   };
 
   const addGoalHandler = () => {
-    setCourseGoals((courseGoals) => [...courseGoals, enteredGoal]);
+    setCourseGoals((courseGoals) => [...courseGoals, { id: Math.random.toString(), value: enteredGoal }]);
   };
   const { root, input, inputContainer, listItem } = styles;
   return (
@@ -25,11 +31,15 @@ export default function App() {
         <Button title='Add' onPress={addGoalHandler} />
       </View>
       <View>
-        {courseGoals.map((goal) => (
-          <View style={listItem} key={goal}>
-            <Text> ❤️ {goal} </Text>
-          </View>
-        ))}
+        <FlatList
+          data={courseGoals}
+          keyExtractor={(itemData) => itemData.id}
+          renderItem={(itemData) => (
+            <View style={listItem}>
+              <Text> ❤️ {itemData.item.value} </Text>
+            </View>
+          )}
+        />
       </View>
     </View>
   );
@@ -53,7 +63,7 @@ const styles = StyleSheet.create({
   },
   listItem: {
     padding: 10,
-    marginVertical: 10,
+    marginVertical: 15,
     backgroundColor: '#ccc',
     borderColor: 'black',
     borderWidth: 1,
